@@ -255,7 +255,6 @@ normal:
 mov bx ,[helper_y+di]
 add bx,si
 
-
 push word [helper_x+di]
 push word bx 
 call clearprev
@@ -270,7 +269,9 @@ add bx,16
 cmp bx,173
 
 je skip
+
 cmp bx,173
+
 jg not_collide
 
 mov bx ,[helper_y+di]
@@ -284,17 +285,11 @@ push word [helper_num+di]
 
 call printchar
 
-
 jmp flago
 
 skip:
 
-
 push word [helper_x+di]
-mov ax, [helper_x+di]
-add ax,16 
-
-push ax 
 
 call collision
 
@@ -302,14 +297,18 @@ pop ax
 
 cmp ax,1 
 jne not_collide
-mov word [helper_collide],1
+mov word [helper_collide+di],1
+
+call delay 
+call delay 
+jmp flago 
 
 not_collide:
 
 push word [helper_x+di]
 push word [helper_y+di]
 push word 23 
-mov word [back],4
+
 call printchar
 
 flago:
