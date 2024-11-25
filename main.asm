@@ -693,4 +693,117 @@ ret
 
 
 
+bosketer:    ;prints the basket onto the screen
+push ax
+push bx
+push cx
+push dx
+push si
+
+;initials
+xor ax,ax
+xor bx,bx
+xor cx,cx
+xor dx,dx
+mov si,0
+mov ah,0ch ;write a pixel
+mov al,00000110b ; colour
+mov bh,00h ; select page always zero
+
+
+;llop work basically iterates through the string to get coords of pixels to change
+lop:
+mov cx,[basketx+si] ; x
+mov dx,[basketx+si+2] ; y
+int 10h
+
+;compares if all the pixels have ended
+add si,4
+cmp word [basketx+si],'$'
+jne lop
+
+;adds the black or hollow part of the basket
+call blackenator
+
+
+
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+
+
+;makes initial adjustments
+initializer:
+push ax
+push bx
+push cx
+push dx
+
+;setting video mod 320 x 200 with 256 colors
+mov ah,00h
+mov al,13h
+int 10h
+
+
+xor ax,ax
+xor bx,bx
+;clearing the strange background
+mov ah,0Bh
+mov bh,0Fh
+mov bl,00h ;current not clearing background to desired color :(
+int 10h 
+
+
+
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+
+
+
+scoreboard:
+
+push word 0
+push word 10
+push word 18
+
+call printchar
+
+
+push word 0
+push word 26
+push word 2
+
+call printchar
+
+
+push word 0
+push word 42
+push word 14
+
+call printchar
+
+
+push word 0
+push word 58
+push word 17
+
+call printchar
+
+
+push word 0
+push word 74
+push word 4
+
+call printchar
+
+
+ret 
+
+
 
