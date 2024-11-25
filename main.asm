@@ -255,6 +255,7 @@ normal:
 mov bx ,[helper_y+di]
 add bx,si
 
+
 push word [helper_x+di]
 push word bx 
 call clearprev
@@ -269,9 +270,7 @@ add bx,16
 cmp bx,173
 
 je skip
-
 cmp bx,173
-
 jg not_collide
 
 mov bx ,[helper_y+di]
@@ -285,11 +284,17 @@ push word [helper_num+di]
 
 call printchar
 
+
 jmp flago
 
 skip:
 
+
 push word [helper_x+di]
+mov ax, [helper_x+di]
+add ax,16 
+
+;push ax 
 
 call collision
 
@@ -297,18 +302,14 @@ pop ax
 
 cmp ax,1 
 jne not_collide
-mov word [helper_collide+di],1
-
-call delay 
-call delay 
-jmp flago 
+mov word [helper_collide],1
 
 not_collide:
 
 push word [helper_x+di]
 push word [helper_y+di]
 push word 23 
-
+mov word [back],4
 call printchar
 
 flago:
@@ -354,28 +355,37 @@ push bp
 mov bp,sp
 push ax
 
-;comapares if the leftmost pixel of boosket is ahead of the char or no
-mov ax,[colider]
-cmp ax,[bp+6]
-jg ond
-
-;comapares if the rightmost pixel of boosket is behind of the char or no
-mov ax,[colider+2]
-cmp ax,[bp+4]
+;comapares if the leftmost pixel of char is ahead of the leftmost of basket or no
+mov ax,[bp+4]
+cmp ax,[colider]
 jl ond
 
+;mov ax,[colider]
+;cmp ax,[bp+6]
+;jg ond
+
+;comapares if the rightmost pixel of char is behind of the rightmost of boosket or no
+add ax,16
+cmp ax,[colider+2]
+jg ond
+
+
+;mov ax,[colider+2]
+;cmp ax,[bp+4]
+;jl ond
+
 ;retruns 1
-mov word [bp+6],1
+mov word [bp+4],1
 jmp ond2
 
 
 ond:    ;retruns 0
-mov word [bp+6],0
+mov word [bp+4],0
 
 ond2:  ;ends the foonction
 pop ax
 pop bp
-ret 2
+ret 
 
 
 
@@ -1444,3 +1454,4 @@ strong: db 0,0,0
 
 
 colider:dw 138,188
+
