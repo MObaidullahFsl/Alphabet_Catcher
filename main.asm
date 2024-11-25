@@ -519,4 +519,178 @@ popa
 ret
 
 
+scorer:
+pushA
+
+cmp word [scorex],34
+jge flagk
+
+
+flagl:
+push word [scorex]
+push word [scorey]
+push word 9
+call printchar
+
+add word [scorex], 17
+
+popa
+ret
+
+
+flagk:
+mov word [scorex],0
+add word [scorey],1
+
+push word [scorex]
+push word [scorey]
+push word 9
+call printchar
+popa
+ret
+
+
+
+updatedkb:
+pusha
+;read from keyboard
+in al,0x60
+
+
+;compares if the right arrow key is pressed or not
+cmp al,0x4D
+;cmp al,0x36
+je righter
+
+;compares if the left arrow key is pressed or not
+cmp al,0x4B
+;cmp al,0x2a
+je lefter
+
+jmp endofi ;if none have been pressed this will jump to the end of the interupt
+
+righter: ;moves the basket to the right,clears the screen and prints it again
+mov ax,[basketx+30*4]
+add ax,12         ;makes adjustments so that we get the rightmost pixel
+cmp ax,320    ;compares if the basket has gone out of bounds on the right
+ja endofi
+call moveright
+call clrscn
+call bosketer
+jmp endofi
+
+lefter:  ;moves the basket to the left,clears the screen and prints it again
+mov ax,[basketx]
+sub ax,10    ;makes adjustments so that we get the leftmost pixel
+cmp ax,38  ;compares if the basket has gone out of bounds on the left
+jb endofi
+call moveleft
+call clrscn
+call bosketer
+
+
+endofi:
+
+mov al, 0x20
+out 0x20, al 
+popA
+iret 
+
+
+;moves the basket left by decrementing the value of x for the pixels in the string
+moveleft:
+push si
+
+mov si,0
+
+subbr:
+sub word [basketx+si],1   ;add a greater number to move right faster
+add si,4
+cmp word [basketx+si],'$'
+jne subbr
+
+mov si,0
+
+subbl:
+sub word [blake+si],1    ;add a greater number to move right faster
+add si,4
+cmp word [blake+si],'$'
+jne subbl
+
+pop si
+ret
+
+
+
+
+;moves the basket right by incrementing the value of x for the pixels in the string
+moveright:
+push si
+
+mov si,0
+
+addbr:
+add word [basketx+si],1   ;add a greater number to move right faster
+add si,4
+cmp word [basketx+si],'$'
+jne addbr
+
+mov si,0
+
+addbl:
+add word [blake+si],1    ;add a greater number to move right faster
+add si,4
+cmp word [blake+si],'$'
+jne addbl
+
+
+pop si
+ret
+
+
+blackenator:    ;adds the hollow part of the basket same as bosketer but with string and colour changed
+push ax
+push bx
+push cx
+push dx
+push si
+
+
+xor ax,ax
+xor bx,bx
+xor cx,cx
+xor dx,dx
+mov si,0
+
+mov ah,0ch ;write a pixel
+mov al,00000000b ; colour
+mov bh,00h ; select page always zero
+
+
+;llop work basically iterates through the string to get coords of pixels to change
+lop2:
+mov cx,[blake+si] ; y
+mov dx,[blake+si+2]
+int 10h
+
+;compares if all the pixels have ended
+add si,4
+cmp word [blake+si],'$'
+jne lop2
+
+
+
+pop si
+pop dx
+pop cx
+pop bx
+pop ax
+ret
+
+
+
+
+
+
+
 
