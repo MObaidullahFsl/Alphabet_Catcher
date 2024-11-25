@@ -297,12 +297,15 @@ add ax,16
 ;push ax 
 
 call collision
-
+xor ax,ax
 pop ax 
 
 cmp ax,1 
 jne not_collide
 mov word [helper_collide],1
+mov ax,0x4c00
+int 21h
+;jmp flago
 
 not_collide:
 
@@ -634,7 +637,7 @@ push si
 mov si,0
 
 subbr:
-sub word [basketx+si],1   ;add a greater number to move right faster
+sub word [basketx+si],1   ;sub a greater number to move left faster
 add si,4
 cmp word [basketx+si],'$'
 jne subbr
@@ -642,10 +645,14 @@ jne subbr
 mov si,0
 
 subbl:
-sub word [blake+si],1    ;add a greater number to move right faster
+sub word [blake+si],1    ;sub a greater number to move left faster
 add si,4
 cmp word [blake+si],'$'
 jne subbl
+
+sub word [colider],1       ;sub a greater number to move left faster
+sub word [colider+2],1     ;sub a greater number to move left faster
+
 
 pop si
 ret
@@ -673,6 +680,8 @@ add si,4
 cmp word [blake+si],'$'
 jne addbl
 
+add word [colider],1       ;add a greater number to move right faster
+add word [colider+2],1     ;add a greater number to move right faster
 
 pop si
 ret
@@ -1454,4 +1463,32 @@ strong: db 0,0,0
 
 
 colider:dw 138,188
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
