@@ -326,3 +326,197 @@ popA
 ret  
 
 
+
+blank:
+mov al,0
+jmp flagj
+
+clearprev:
+
+push bp
+mov bp,sp
+pusha 
+
+
+
+mov dx,[bp+4]
+mov bx,dx
+push dx
+xor dx,dx
+
+mov ax,320 
+mul bx
+add ax, [bp+6]
+
+pop dx 
+
+cmp dx, 180
+jg flagf
+
+mov si, ax 
+
+mov cx, [bp+6]
+
+mov ah, 0x0c
+
+mov bx, cx
+add bx, 16
+
+mov di, dx
+add di,16 
+
+flage:
+
+cmp word [bgflag], 0
+
+je blank
+mov al, [sprite_buffer+si]
+
+
+call colorchecker
+flagj:
+int 10h 
+
+inc si 
+inc cx 
+
+cmp cx, bx 
+jl flage
+
+add si,304
+mov cx, [bp+6]
+inc dx 
+cmp dx,di
+jl flage 
+
+
+flagf:
+
+popa
+pop bp 
+
+
+
+ret 2
+
+
+
+
+file_error: 
+
+jmp flagg
+    read_err:
+    jmp flagg
+
+colorchecker:
+
+ cmp al,0
+    je col1 
+cmp al,1
+     je col2
+cmp al,2
+     je col3 
+cmp al,3
+     je col4 
+cmp al,4
+     je col5 
+cmp al,5
+     je col6 
+cmp al,6
+    je col7
+     
+
+
+col1:
+mov al,1011b
+jmp flagd
+col2:
+mov al,1110b
+jmp flagd
+col3:
+mov al,15
+jmp flagd
+col4:
+mov al,0110b
+jmp flagd
+col5:
+mov al,0111b
+jmp flagd
+col6:
+mov al,1000b
+jmp flagd
+col7:
+mov al,1010b
+
+flagd:
+
+
+
+ret
+
+
+background_maker:
+
+pusha
+
+
+ mov ah, 0x3D        ; DOS function to open file
+    mov al, 0           ; Read-only mode
+    mov dx, file_name ; Pointer to file name
+    int 0x21            ; DOS interrupt
+    jc file_error       ; Jump if error
+    mov [file_handle], ax          ; File handle in BX
+
+
+
+    ; Read the file
+    mov ah, 0x3F        ; DOS function to read file
+
+    mov dx, sprite_buffer ; Load the address of sprite_buffer into DX
+
+    mov bx,[file_handle]
+    mov cx, 56000    ; Number of bytes to read
+    int 0x21            ; DOS interrupt
+    jc read_err       ; Jump if error
+
+    ; Close the file
+    mov ah, 0x3E        ; DOS function to close file
+    mov bx, [file_handle]    ; Load file handle
+    int 0x21
+
+
+
+
+mov si,0
+mov dx, 0            ; Starting row (Y)
+mov cx, 0            ; Starting column (X)
+
+
+draw_sprite:
+    mov al, [sprite_buffer+si]     ; Load pixel from sprite buffer 
+
+call colorchecker
+ 
+
+    mov ah, 0x0C     ; Put Pixel service
+    int 3h
+    int 0x10         ; Draw the pixel
+    inc si           ; Move to next byte in buffer
+    inc cx           ; Increment column
+    cmp cx, 320      ; Check if end of row
+    jl continue_draw
+    inc dx           ; Move to next row
+    xor cx, cx       ; Reset column to 0
+
+continue_draw:
+    cmp dx, 200      ; Check if end of sprite
+    jl draw_sprite
+
+mov word [bgflag],1
+
+popa
+
+ret
+
+
+
