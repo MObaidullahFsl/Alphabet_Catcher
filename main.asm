@@ -151,3 +151,178 @@ pop bp
 ret 6
 
 
+
+
+
+movchar:
+
+pushA
+
+mov cx,[totalchars]
+mov di,0
+
+
+sub sp,2
+push 255
+call randG
+pop ax 
+
+mov [fore],ax
+
+
+mov word [back],0
+
+mover:
+
+sub sp,2
+push 266
+call randG
+pop ax
+
+add ax,38
+
+mov [helper_x+di],ax
+
+
+sub sp,2
+push 30
+call randG
+pop bx
+
+mov [helper_y+di],bx
+
+
+push 25
+call randG
+pop dx
+
+
+
+mov [helper_num+di],dx
+
+push ax 
+push bx
+push dx 
+
+
+call printchar
+
+add di,2
+
+
+loop mover
+
+call delay
+
+
+mov di,0
+
+mov cx ,[totalchars]
+
+call clr2
+
+
+mov di,0
+
+mov cx, [totalchars]
+
+mov si,[lines]
+
+mov dx,173
+
+
+godown:
+
+cmp word [epilepsy],1
+jne normal
+
+
+sub sp,2
+push 255
+call randG
+pop ax 
+
+mov [fore],ax
+
+sub sp,2
+push 255
+call randG
+pop ax 
+
+mov [back],ax
+
+
+normal: 
+
+mov bx ,[helper_y+di]
+add bx,si
+
+add bx,16 
+cmp bx,173
+
+je skip
+
+push word [helper_x+di]
+
+push word bx
+
+push word [helper_num+di]
+
+call printchar
+
+
+skip:
+
+push word [helper_x+di]
+mov word bx, [helper_x +di] 
+add bx,16
+push bx 
+
+call collision
+
+pop ax 
+
+cmp ax,0 
+je flagn
+
+
+
+flagn:
+
+cmp 
+
+
+add di,2
+
+loop godown
+
+mov di,0
+mov cx, [totalchars]
+
+call delay
+
+
+call clr2
+call scoreboard
+
+
+
+add si,[lines]
+
+mov di, 0
+
+dec dx
+mov cx, [totalchars]
+cmp dx,0
+
+
+
+jne godown
+
+
+popA
+
+
+ret  
+
+
