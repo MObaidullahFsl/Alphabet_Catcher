@@ -82,3 +82,72 @@ randG:
  popa
  pop bp
  ret 2
+
+
+
+
+printchar:
+
+push bp
+mov bp,sp
+
+pushA
+
+
+
+mov ax, 256
+mov bx, [bp+4]
+mul bx
+ 
+mov bx,sprite_data
+add bx,ax  ; bx has starting address of alphabet
+
+mov cx, [bp+8] ; starting x             
+mov dx, [bp+6]  ; starting y
+
+loop_rows:
+    
+    push cx            
+       
+
+loop_columns:
+    
+              
+   mov al,[bx]
+   inc bx   
+    cmp al, 1          
+
+    jne skip_pixel    
+
+    mov ah, 0x0C        
+    mov al, [fore]         ; White color
+    int 0x10
+    jmp next_pixel
+
+skip_pixel:
+;    mov ah, 0x0C  
+ ;   mov al, [back]
+  ; int 0x10
+
+next_pixel:
+    inc cx      
+    mov si,[bp+8]       
+    add si, 16
+    cmp cx,si        
+    jnz loop_columns     
+
+    pop cx              
+    add dx, 1          
+   mov si,[bp+6]       
+    add si, 16
+    cmp dx,si            ; End of sprite?
+    jne loop_rows        ; Continue with next row
+
+end:
+
+popA
+pop bp
+
+ret 6
+
+
